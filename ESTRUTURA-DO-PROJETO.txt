@@ -1,0 +1,171 @@
+ULIFECONECTA - ESTRUTURA DO PROJETO E DECISOES
+================================================
+
+VISÃO GERAL
+-----------
+O UlifeConecta é uma aplicação web acadêmica feita com React e TypeScript.
+A interface prioriza telas pequenas, mas também se adapta a telas maiores. O
+Firebase fornece autenticação e alguns recursos de dados. O GitHub Actions
+compila e publica o site no GitHub Pages quando há alterações na branch main.
+
+ESTRUTURA DE PASTAS E ARQUIVOS
+------------------------------
+
+src/
+  index.tsx
+    Ponto de entrada da interface. Monta o React e envolve a aplicação com
+    FirebaseAuthGate para que as telas protegidas dependam de uma sessão válida.
+
+  main.tsx
+    Componente principal do app e do feed. Controla a navegação entre abas,
+    categorias, publicações, curtidas, itens salvos, modais e notificações.
+    Também contém o painel lateral de tendências, links rápidos e veteranos
+    online, exibido ao lado do feed em telas grandes.
+
+  index.css
+    Carrega as diretivas do Tailwind CSS usadas para gerar os estilos.
+
+  auth/
+    firebase-auth.tsx
+      Implementa o fluxo de autenticação: cadastro, login, redefinição de senha,
+      persistência da sessão e estado de autenticação compartilhado com o app.
+
+  lib/
+    firebase.ts
+      Lê a configuração pública do Firebase a partir das variáveis de ambiente,
+      inicializa os SDKs de Authentication e Firestore e identifica campos
+      ausentes para exibir uma mensagem explícita de configuração.
+
+  components/
+    buscar-page.tsx
+    comments-panel.tsx
+    conteudo-page.tsx
+    duvidas-page.tsx
+    forum-page.tsx
+    horarios-page.tsx
+    material-page.tsx
+    notifications-panel.tsx
+    perfil-page.tsx
+    salas-page.tsx
+    veteranos-page.tsx
+      Telas e painéis por funcionalidade. Separá-los do componente principal
+      facilita localizar e alterar cada área sem misturar todo o código visual.
+
+    placeholder-page.tsx
+    static-data-notice.tsx
+      Componentes auxiliares para telas ainda provisórias e para indicar quando
+      os dados apresentados são estáticos ou demonstrativos.
+
+public/
+  Arquivos estáticos servidos diretamente, como o ícone do site.
+
+.github/workflows/deploy.yml
+  Workflow de CI/CD. Instala as dependências, executa o build e publica o
+  diretório dist no GitHub Pages após um push em main, ou por execução manual.
+
+firestore.rules
+  Regras de acesso sugeridas para comentários e materiais no Firestore.
+  Este arquivo precisa ser publicado no projeto Firebase; existir no
+  repositório, por si só, não altera as regras de produção.
+
+.env.example
+  Modelo dos nomes das variáveis necessárias para configurar o Firebase Web.
+
+.env.local
+  Configuração local usada durante o desenvolvimento. É ignorada pelo Git e
+  não deve ser enviada ao repositório.
+
+FIREBASE_SETUP.md
+  Passos para configurar o Firebase Authentication e o Firestore.
+
+SECURITY-REVIEW.md
+  Registro da revisão de segurança realizada e de seu achado sobre autoria de
+  comentários, com a ressalva de que as regras implantadas precisam ser
+  conferidas no Console Firebase.
+
+index.html
+  Documento HTML inicial que contém a raiz onde a aplicação React é montada.
+
+package.json / package-lock.json
+  Dependências, scripts e versões instaladas. O lockfile permite que npm ci
+  reproduza a instalação usada pelo workflow de publicação.
+
+vite.config.ts
+  Configuração do Vite. Ajusta o caminho público para funcionar tanto no
+  desenvolvimento local quanto no endereço de projeto do GitHub Pages e separa
+  o código do Firebase em um bundle próprio.
+
+tailwind.config.js / postcss.config.js
+  Configuração do Tailwind CSS e do processamento dos estilos.
+
+tsconfig.json / src/vite-env.d.ts
+  Configuração do TypeScript e tipos de ambiente do Vite.
+
+DECISÕES TÉCNICAS
+-----------------
+
+React com TypeScript
+  React permite construir a interface em componentes reutilizáveis. TypeScript
+  ajuda a documentar os formatos de dados e a encontrar alguns erros durante
+  o build, antes da publicação.
+
+Vite
+  Foi escolhido por oferecer inicialização rápida no desenvolvimento e um
+  build de produção direto, adequado a um site estático como o GitHub Pages.
+
+Tailwind CSS
+  Permite compor os estilos diretamente nos componentes e manter rapidamente
+  consistência de cores, espaçamentos e comportamento responsivo.
+
+Firebase Authentication e Cloud Firestore
+  O Firebase fornece autenticação por email e senha e um banco de dados
+  acessível pela aplicação web. Isso atende ao começo da integração sem
+  exigir um servidor próprio para esses fluxos.
+
+Configuração Firebase por variáveis
+  Os valores VITE_FIREBASE_* são fornecidos localmente por .env.local e, no
+  build do GitHub Actions, pelas variáveis do repositório. A configuração de
+  cliente Web é incorporada ao JavaScript público do site; portanto, não é uma
+  senha. Restrições de acesso devem ser feitas com regras Firebase e controles
+  do projeto. Credenciais Admin SDK e chaves de conta de serviço nunca devem
+  ser colocadas no frontend nem nessas variáveis.
+
+GitHub Pages com GitHub Actions
+  O Pages hospeda o resultado estático do Vite. O workflow automatiza
+  instalação, compilação e publicação a cada push em main, reduzindo passos
+  manuais e mantendo o site atualizado com o código.
+
+Navegação controlada pelo estado React
+  As abas e categorias são controladas no componente principal sem adicionar
+  uma biblioteca de roteamento. Isso mantém simples a navegação atual do app,
+  que é organizada como uma interface de feed com painéis e abas.
+
+ESTADO ATUAL DA INTEGRAÇÃO
+--------------------------
+- Cadastro, login e redefinição de senha usam Firebase Authentication.
+- Comentários são lidos e gravados em posts/{postId}/comments no Firestore.
+- A tela Conteúdo lê materiais da coleção contents.
+- Publicações do feed, curtidas, itens salvos, notificações e alguns dados
+  exibidos nos painéis ainda são mantidos localmente ou são demonstrativos.
+- As regras locais do Firestore não vinculam o nome exibido do autor do
+  comentário ao usuário autenticado. Isso pode permitir falsificação de
+  autoria se essas regras estiverem publicadas. Consulte o SECURITY-REVIEW.md
+  no repositório e verifique/corrija as regras no Firebase antes de tratar a
+  funcionalidade como pronta para produção.
+
+COMO DESENVOLVER E PUBLICAR
+---------------------------
+1. Instale o Node.js e o npm.
+2. Execute npm install na pasta do projeto.
+3. Copie .env.example para .env.local e preencha as variáveis do app Web
+   Firebase. Os nomes e passos estão em FIREBASE_SETUP.md.
+4. Execute npm run dev para iniciar o servidor local.
+5. Execute npm run build para verificar a compilação de produção.
+6. Envie as alterações à branch main do GitHub. O workflow publica a nova
+   versão no endereço:
+   https://gpossobon.github.io/UlifeConecta/
+
+Para autenticação no site publicado, o domínio gpossobon.github.io também
+precisa estar autorizado nas configurações do Firebase Authentication.
+
+Fim.
