@@ -59,6 +59,6 @@ As variáveis do Firebase Web são incorporadas ao JavaScript do site e ficam p�
 - Comentários são lidos e gravados em `posts/{postId}/comments`.
 - A tela Conteúdo lê materiais publicados na coleção `contents`.
 - O feed, curtidas, salvos e notificações ainda usam dados locais de demonstração.
-- Publique as regras de [firestore.rules](./firestore.rules) no Firebase antes de usar comentários e materiais.
+- Publicar as regras de [firestore.rules](./firestore.rules) no Firebase antes de usar comentários e materiais.
 
 Não versionamos `.env.local`, credenciais de serviço, `node_modules` ou `dist`.
