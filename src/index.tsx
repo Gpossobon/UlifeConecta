@@ -1,7 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import MobileFeed from './main'
-import { FirebaseAuthGate } from './auth/firebase-auth'
+import { FirebaseAuthGate } from './features/auth/firebase-auth'
 import './index.css'
 
 ReactDOM.createRoot(document.getElementById('root')!).render(

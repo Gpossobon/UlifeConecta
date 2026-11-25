@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { HelpCircle, Search, CheckCircle, Clock, MessageCircle, Heart, ChevronRight } from "lucide-react";
-import { StaticDataNotice } from "./static-data-notice";
+import { StaticDataNotice } from "../../shared/components/static-data-notice";
 
 const duvidas = [
   { id: 1, author: "Carlos Mendes", avatar: "C", color: "bg-red-100 text-red-600", materia: "Cálculo II", time: "15min", content: "Alguém sabe qual sala é a aula de Cálculo II hoje? O app da faculdade não está atualizando...", likes: 12, comments: 8, solved: true, tags: ["Sala", "Horário"] },

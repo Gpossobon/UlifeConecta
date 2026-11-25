@@ -1,15 +1,8 @@
 import { useEffect, useRef, useState, type FormEvent } from "react";
-import { addDoc, collection, onSnapshot, orderBy, query, serverTimestamp, Timestamp, type Firestore } from "firebase/firestore";
+import type { Firestore, Timestamp } from "firebase/firestore";
 import type { User } from "firebase/auth";
 import { MessageCircle, Send, X } from "lucide-react";
-
-type Comment = {
-  id: string;
-  author: string;
-  authorId: string;
-  createdAt: Timestamp | null;
-  content: string;
-};
+import { addComment, subscribeToComments, type Comment } from "../../../services/comments/comments-service";
 
 type CommentsPanelProps = {
   post: {
@@ -34,22 +27,6 @@ function getCommentTime(timestamp: Timestamp | null) {
   const hours = Math.floor(minutes / 60);
   if (hours < 24) return `${hours} h`;
   return `${Math.floor(hours / 24)} d`;
-}
-
-function parseComment(id: string, value: Record<string, unknown>): Comment {
-  if (typeof value.author !== "string" || typeof value.authorId !== "string" || typeof value.content !== "string") {
-    throw new Error("Um comentário no Firestore tem dados inválidos.");
-  }
-  if (value.createdAt !== null && !(value.createdAt instanceof Timestamp)) {
-    throw new Error("A data de um comentário no Firestore está em formato inválido.");
-  }
-  return {
-    id,
-    author: value.author,
-    authorId: value.authorId,
-    createdAt: value.createdAt instanceof Timestamp ? value.createdAt : null,
-    content: value.content,
-  };
 }
 
 export function CommentsPanel({ post, db, user, onCountChange, onClose }: CommentsPanelProps) {
@@ -77,23 +54,14 @@ export function CommentsPanel({ post, db, user, onCountChange, onClose }: Commen
     };
     document.addEventListener("keydown", handleKeyDown);
 
-    const commentsQuery = query(
-      collection(db, "posts", String(post.id), "comments"),
-      orderBy("createdAt", "asc"),
-    );
-    const unsubscribe = onSnapshot(
-      commentsQuery,
-      (snapshot) => {
-        try {
-          const nextComments = snapshot.docs.map((document) => parseComment(document.id, document.data()));
-          setComments(nextComments);
-          onCountChangeRef.current(snapshot.size);
-          setErrorMessage("");
-        } catch (error) {
-          setErrorMessage(error instanceof Error ? error.message : "Não foi possível ler os comentários.");
-        } finally {
-          setLoading(false);
-        }
+    const unsubscribe = subscribeToComments(
+      db,
+      post.id,
+      (nextComments) => {
+        setComments(nextComments);
+        onCountChangeRef.current(nextComments.length);
+        setErrorMessage("");
+        setLoading(false);
       },
       (error) => {
         setErrorMessage(`Não foi possível carregar os comentários: ${error.message}`);
@@ -115,12 +83,7 @@ export function CommentsPanel({ post, db, user, onCountChange, onClose }: Commen
     setSubmitting(true);
     setErrorMessage("");
     try {
-      await addDoc(collection(db, "posts", String(post.id), "comments"), {
-        author: user.displayName || user.email || "Estudante",
-        authorId: user.uid,
-        content,
-        createdAt: serverTimestamp(),
-      });
+      await addComment(db, post.id, user, content);
       setDraft("");
       inputRef.current?.focus();
     } catch (error) {

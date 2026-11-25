@@ -8,21 +8,14 @@ import {
   type ReactNode,
 } from "react";
 import {
-  browserLocalPersistence,
-  createUserWithEmailAndPassword,
-  onAuthStateChanged,
-  sendPasswordResetEmail,
-  setPersistence,
-  signInWithEmailAndPassword,
-  signOut,
-  updateProfile,
   type Auth,
   type User,
 } from "firebase/auth";
 import { FirebaseError } from "firebase/app";
 import type { Firestore } from "firebase/firestore";
 import { LockKeyhole, Mail, UserRound } from "lucide-react";
-import { firebaseAuth, firestore, missingFirebaseConfig } from "../lib/firebase";
+import { firebaseAuth, firestore, missingFirebaseConfig } from "../../services/firebase";
+import { observeAuthState, performAuthAction, signOutUser as signOutWithFirebase } from "../../services/auth/auth-service";
 
 type AuthMode = "sign-in" | "sign-up" | "reset-password";
 
@@ -54,7 +47,7 @@ export function FirebaseAuthGate({ children }: { children: ReactNode }) {
       return;
     }
 
-    return onAuthStateChanged(
+    return observeAuthState(
       firebaseAuth,
       (nextUser) => {
         setUser(nextUser);
@@ -74,7 +67,7 @@ export function FirebaseAuthGate({ children }: { children: ReactNode }) {
       return;
     }
     try {
-      await signOut(firebaseAuth);
+      await signOutWithFirebase(firebaseAuth);
       setSignOutError("");
     } catch (error) {
       const message = error instanceof Error ? error.message : "Não foi possível sair da conta.";
@@ -192,17 +185,9 @@ function FirebaseAuthScreen({ auth }: { auth: Auth }) {
     setSuccessMessage("");
 
     try {
-      await setPersistence(auth, browserLocalPersistence);
-      if (mode === "sign-up") {
-        const credential = await createUserWithEmailAndPassword(auth, email.trim(), password);
-        if (name.trim()) {
-          await updateProfile(credential.user, { displayName: name.trim() });
-        }
-      } else if (mode === "reset-password") {
-        await sendPasswordResetEmail(auth, email.trim());
+      await performAuthAction(auth, mode, { email, password, name });
+      if (mode === "reset-password") {
         setSuccessMessage("Se houver uma conta com esse email, você receberá instruções para redefinir a senha.");
-      } else {
-        await signInWithEmailAndPassword(auth, email.trim(), password);
       }
     } catch (error) {
       setErrorMessage(getAuthErrorMessage(error));

@@ -7,7 +7,7 @@ Review date: 2026-11-25
 ### MEDIUM — Comment authorship can be spoofed
 
 **Confidence:** 9/10
-**Affected files:** `firestore.rules` (lines 14–17) and `src/components/comments-panel.tsx` (line 176)
+**Affected files:** `firestore.rules` (lines 14–17), `src/services/comments/comments-service.ts` (lines 67–68), and `src/features/comments/components/comments-panel.tsx` (line 139)
 
 The Firestore create rule requires `authorId` to match the authenticated user's UID, but it accepts any non-empty `author` string up to 120 characters. An authenticated user can bypass the client UI and write a comment directly to Firestore with another person's name. The comments interface displays that string as the comment author, which can mislead readers about who posted it.
 

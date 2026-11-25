@@ -17,44 +17,69 @@ src/
     FirebaseAuthGate para que as telas protegidas dependam de uma sessão válida.
 
   main.tsx
-    Componente principal do app e do feed. Controla a navegação entre abas,
-    categorias, publicações, curtidas, itens salvos, modais e notificações.
-    Também contém o painel lateral de tendências, links rápidos e veteranos
-    online, exibido ao lado do feed em telas grandes.
+    Ponto de entrada da tela principal, reexportada de features/feed.
 
   index.css
     Carrega as diretivas do Tailwind CSS usadas para gerar os estilos.
 
-  auth/
-    firebase-auth.tsx
-      Implementa o fluxo de autenticação: cadastro, login, redefinição de senha,
-      persistência da sessão e estado de autenticação compartilhado com o app.
+  features/
+    auth/
+      firebase-auth.tsx
+        Contexto, estado da sessão e interface de autenticação.
+    comments/components/
+      comments-panel.tsx
+        Interface para acompanhar e enviar comentários.
+    community/
+      duvidas-page.tsx, forum-page.tsx, horarios-page.tsx,
+      salas-page.tsx, veteranos-page.tsx
+        Telas das áreas de comunidade, agrupadas como uma funcionalidade.
+    content/
+      components/conteudo-page.tsx
+        Tela única de materiais/conteúdos conectada ao Firestore. Tanto a aba
+        Conteúdo quanto a categoria Material abrem essa mesma tela.
+      types.ts
+        Tipos usados na funcionalidade de conteúdo.
+    feed/
+      mobile-feed.tsx
+        Orquestra a navegação, os modais e as interações da tela principal.
+      components/
+        feed-post-card.tsx, feed-post-list.tsx, community-sidebar.tsx
+          Apresentam os cartões, estados/lista do feed e painel lateral.
+      hooks/
+        use-feed.ts, use-focus-trap.ts
+          Reúnem estado e interações do feed e comportamento de acessibilidade
+          do modal.
+      services/feed-service.ts
+        Fornece e transforma publicações demonstrativas em memória; não
+        persiste publicações no Firestore.
+      types.ts
+        Tipos da funcionalidade de feed.
+    notifications/
+      notifications-panel.tsx
+        Interface de notificações.
+    profile/
+      perfil-page.tsx
+        Interface de perfil e publicações salvas.
+    search/
+      buscar-page.tsx
+        Interface de busca.
 
-  lib/
+  services/
     firebase.ts
       Lê a configuração pública do Firebase a partir das variáveis de ambiente,
       inicializa os SDKs de Authentication e Firestore e identifica campos
       ausentes para exibir uma mensagem explícita de configuração.
+    auth/auth-service.ts
+      Operações de cadastro, login, logout e redefinição de senha.
+    comments/comments-service.ts
+      Leitura em tempo real e gravação de comentários no Firestore, incluindo
+      validação dos dados recebidos.
+    content/content-service.ts
+      Consulta e validação dos materiais armazenados no Firestore.
 
-  components/
-    buscar-page.tsx
-    comments-panel.tsx
-    conteudo-page.tsx
-    duvidas-page.tsx
-    forum-page.tsx
-    horarios-page.tsx
-    material-page.tsx
-    notifications-panel.tsx
-    perfil-page.tsx
-    salas-page.tsx
-    veteranos-page.tsx
-      Telas e painéis por funcionalidade. Separá-los do componente principal
-      facilita localizar e alterar cada área sem misturar todo o código visual.
-
-    placeholder-page.tsx
+  shared/components/
     static-data-notice.tsx
-      Componentes auxiliares para telas ainda provisórias e para indicar quando
-      os dados apresentados são estáticos ou demonstrativos.
+      Aviso reutilizável para indicar quando os dados são demonstrativos.
 
 public/
   Arquivos estáticos servidos diretamente, como o ícone do site.
@@ -136,9 +161,20 @@ GitHub Pages com GitHub Actions
   manuais e mantendo o site atualizado com o código.
 
 Navegação controlada pelo estado React
-  As abas e categorias são controladas no componente principal sem adicionar
-  uma biblioteca de roteamento. Isso mantém simples a navegação atual do app,
-  que é organizada como uma interface de feed com painéis e abas.
+  As abas e categorias continuam controladas pelo estado React na tela principal
+  do feed, sem adicionar uma biblioteca de roteamento. Isso mantém simples a
+  navegação atual do app, organizada como uma interface de feed com painéis.
+
+Organização por funcionalidade e serviços
+  Cada área mantém suas telas, componentes, hooks e tipos próximos entre si.
+  Chamadas ao Firebase ficam em services/, separadas da apresentação, o que
+  facilita localizar responsabilidades e testar mudanças sem espalhar acesso
+  ao banco pelas telas.
+
+Uma tela única para materiais
+  A categoria Material e a aba Conteúdo compartilham ConteudoPage e a mesma
+  coleção contents. Isso evita manter uma página demonstrativa em paralelo à
+  funcionalidade conectada.
 
 ESTADO ATUAL DA INTEGRAÇÃO
 --------------------------

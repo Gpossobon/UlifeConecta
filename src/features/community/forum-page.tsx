@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { MessageCircle, Search, TrendingUp, Heart, Eye, ChevronRight, Pin, Clock, Hash } from "lucide-react";
-import { StaticDataNotice } from "./static-data-notice";
+import { StaticDataNotice } from "../../shared/components/static-data-notice";
 
 type Topic = {
   id: number;

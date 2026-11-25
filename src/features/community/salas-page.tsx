@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { MapPin, Search, Users, Wifi, Monitor, CheckCircle, XCircle, Info } from "lucide-react";
-import { StaticDataNotice } from "./static-data-notice";
+import { StaticDataNotice } from "../../shared/components/static-data-notice";
 
 type Resource = "wifi" | "projetor" | "computadores" | "ar";
 

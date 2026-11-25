@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Clock, AlertCircle, CheckCircle } from "lucide-react";
-import { StaticDataNotice } from "./static-data-notice";
+import { StaticDataNotice } from "../../shared/components/static-data-notice";
 
 const dias = ["Seg", "Ter", "Qua", "Qui", "Sex"];
 const semanaAtual = ["25 Nov", "26 Nov", "27 Nov", "28 Nov", "29 Nov"];

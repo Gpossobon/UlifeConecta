@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Users, Star, MessageCircle, Search, BookOpen, Award } from "lucide-react";
-import { StaticDataNotice } from "./static-data-notice";
+import { StaticDataNotice } from "../../shared/components/static-data-notice";
 
 const veteranos = [
   { id: 1, nome: "Beatriz Lima", semestre: "7º Semestre", curso: "Eng. da Computação", avatar: "B", color: "bg-purple-100 text-purple-600", rating: 4.9, respostas: 87, materiais: 12, especialidades: ["Álgebra Linear", "Cálculo I", "Cálculo II"], online: true, destaque: true },
