@@ -36,6 +36,23 @@ Aplicação web acadêmica mobile-first para conectar estudantes, compartilhar m
    npm run build
    ```
 
+## Publicação no GitHub Pages
+
+O deploy é feito automaticamente pelo GitHub Actions a cada push na branch `main`.
+
+1. No GitHub, abra **Settings → Secrets and variables → Actions → Variables** e crie as seis variáveis abaixo com os valores do app Web Firebase (use os mesmos valores de `.env.local`):
+   - `VITE_FIREBASE_API_KEY`
+   - `VITE_FIREBASE_AUTH_DOMAIN`
+   - `VITE_FIREBASE_PROJECT_ID`
+   - `VITE_FIREBASE_STORAGE_BUCKET`
+   - `VITE_FIREBASE_MESSAGING_SENDER_ID`
+   - `VITE_FIREBASE_APP_ID`
+2. Em **Settings → Pages**, selecione **GitHub Actions** como fonte de publicação.
+3. Aguarde o workflow **Deploy to GitHub Pages** terminar. O site ficará disponível em `https://gpossobon.github.io/UlifeConecta/`.
+4. No Firebase Console, adicione `gpossobon.github.io` em **Authentication → Settings → Authorized domains** para permitir login e cadastro no domínio publicado.
+
+As variáveis do Firebase Web são incorporadas ao JavaScript do site e ficam públicas para os visitantes, como em qualquer app Firebase cliente. Não use credenciais de Admin SDK, chaves de conta de serviço ou outros segredos nessas variáveis.
+
 ## Estado da integração
 
 - Cadastro, login e redefinição de senha usam Firebase Authentication.
