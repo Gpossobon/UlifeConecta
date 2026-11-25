@@ -1,4 +1,3 @@
-import { useState } from "react";
 import {
   HelpCircle, BookOpen, Clock, MapPin, Users, MessageCircle,
   Heart, Bookmark, Settings, ChevronRight, Edit3, LogOut, Bell, Shield, Moon,
@@ -35,6 +34,8 @@ type PerfilPageProps = {
   allPosts: ProfilePost[];
   user: User;
   onSignOut: () => Promise<void>;
+  activeSection: "posts" | "salvos";
+  onActiveSectionChange: (section: "posts" | "salvos") => void;
 };
 
 const SETTINGS_ITEMS = [
@@ -54,8 +55,7 @@ const ICON_COLOR: Record<string, string> = {
   MessageCircle: "text-gray-500",
 };
 
-export function PerfilPage({ savedPostIds, allPosts, user, onSignOut }: PerfilPageProps) {
-  const [activeTab, setActiveTab] = useState<"posts" | "salvos">("posts");
+export function PerfilPage({ savedPostIds, allPosts, user, onSignOut, activeSection, onActiveSectionChange }: PerfilPageProps) {
   const profileName = user.displayName || user.email?.split("@")[0] || "Estudante";
   const profileEmail = user.email || "@estudante";
   const myPosts = allPosts.filter((post) => post.author === "Você"
@@ -107,17 +107,17 @@ export function PerfilPage({ savedPostIds, allPosts, user, onSignOut }: PerfilPa
       <div className="flex border-b border-gray-200 bg-white">
         <button
           type="button"
-          onClick={() => setActiveTab("posts")}
-          aria-pressed={activeTab === "posts"}
-          className={`flex-1 flex items-center justify-center gap-2 py-3 text-sm transition border-b-2 ${activeTab === "posts" ? "border-red-600 text-red-600" : "border-transparent text-gray-500"}`}
+          onClick={() => onActiveSectionChange("posts")}
+          aria-pressed={activeSection === "posts"}
+          className={`flex-1 flex items-center justify-center gap-2 py-3 text-sm transition border-b-2 ${activeSection === "posts" ? "border-red-600 text-red-600" : "border-transparent text-gray-500"}`}
         >
           <Edit3 className="w-4 h-4" aria-hidden="true" /> Minhas publicações
         </button>
         <button
           type="button"
-          onClick={() => setActiveTab("salvos")}
-          aria-pressed={activeTab === "salvos"}
-          className={`flex-1 flex items-center justify-center gap-2 py-3 text-sm transition border-b-2 ${activeTab === "salvos" ? "border-red-600 text-red-600" : "border-transparent text-gray-500"}`}
+          onClick={() => onActiveSectionChange("salvos")}
+          aria-pressed={activeSection === "salvos"}
+          className={`flex-1 flex items-center justify-center gap-2 py-3 text-sm transition border-b-2 ${activeSection === "salvos" ? "border-red-600 text-red-600" : "border-transparent text-gray-500"}`}
         >
           <Bookmark className="w-4 h-4" aria-hidden="true" /> Salvos
           {savedPostIds.size > 0 && (
@@ -128,7 +128,7 @@ export function PerfilPage({ savedPostIds, allPosts, user, onSignOut }: PerfilPa
         </button>
       </div>
 
-      {activeTab === "posts" && (
+      {activeSection === "posts" && (
         <div className="flex flex-col px-4 py-4 gap-3">
           {myPosts.length === 0 ? (
             <EmptyState icon={Edit3} label="Você ainda não publicou nada" />
@@ -155,7 +155,7 @@ export function PerfilPage({ savedPostIds, allPosts, user, onSignOut }: PerfilPa
         </div>
       )}
 
-      {activeTab === "salvos" && (
+      {activeSection === "salvos" && (
         <div className="flex flex-col px-4 py-4 gap-3">
           {savedPosts.length === 0 ? (
             <EmptyState icon={Bookmark} label="Nenhum post salvo ainda" />

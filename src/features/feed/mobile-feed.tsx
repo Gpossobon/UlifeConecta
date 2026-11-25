@@ -2,7 +2,7 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import {
   MessageCircle, Plus, Home, Search,
-  Bell, User, X, BookOpen, Clock, MapPin, Users, HelpCircle,
+  Bell, User, X, BookOpen, Clock, MapPin, Users, HelpCircle, Bookmark,
 } from "lucide-react";
 import { DuvidasPage } from "../community/duvidas-page";
 import { HorariosPage } from "../community/horarios-page";
@@ -24,6 +24,7 @@ import type { BottomTab, FeedCategory, FeedPost } from "./types";
 export default function MobileFeed() {
   const { user, db, signOutUser } = useFirebaseAuth();
   const [activeTab, setActiveTab]           = useState<BottomTab>("home");
+  const [profileSection, setProfileSection] = useState<"posts" | "salvos">("posts");
   const [selectedCategory, setSelectedCategory] = useState<FeedCategory>("all");
   const feed = useFeed();
   const { posts, likedPosts, savedPosts, justLiked, justSaved } = feed;
@@ -84,6 +85,16 @@ export default function MobileFeed() {
     { id: "veterans", label: "Veteranos", icon: Users },
     { id: "content",  label: "Conteúdo",  icon: BookOpen },
     { id: "profile",  label: "Perfil",    icon: User },
+  ];
+
+  const sideNavItems: { id: BottomTab | "notifications" | "saved"; label: string; icon: any }[] = [
+    { id: "home",          label: "Início",        icon: Home },
+    { id: "search",        label: "Buscar",        icon: Search },
+    { id: "notifications", label: "Notificações",  icon: Bell },
+    { id: "saved",         label: "Salvos",        icon: Bookmark },
+    { id: "veterans",      label: "Veteranos",     icon: Users },
+    { id: "content",       label: "Conteúdo",      icon: BookOpen },
+    { id: "profile",       label: "Perfil",        icon: User },
   ];
 
   const tabTitles: Record<BottomTab, string | null> = {
@@ -198,7 +209,8 @@ export default function MobileFeed() {
   const isHome = activeTab === "home";
 
   return (
-    <div className="flex flex-col h-screen bg-gray-50 overflow-hidden">
+    <div className="flex h-screen overflow-hidden bg-gray-50">
+      <div className="flex min-w-0 flex-1 flex-col">
       <header className="sticky top-0 z-10 bg-white border-b border-gray-200">
         <div className="px-4 py-4 flex items-center justify-between relative overflow-hidden">
           <svg className="absolute left-0 top-0 w-40 h-24 opacity-10" viewBox="0 0 120 90" fill="none">
@@ -271,11 +283,11 @@ export default function MobileFeed() {
         )}
       </header>
 
-      <main className="flex-1 overflow-y-auto pb-20">
+      <main className="flex-1 overflow-y-auto pb-20 lg:pb-0">
         {activeTab === "search"   && <BuscarPage />}
         {activeTab === "veterans" && <VeteranosPage />}
         {activeTab === "content"  && <ConteudoPage />}
-        {activeTab === "profile"  && <PerfilPage savedPostIds={savedPosts} allPosts={posts} user={user} onSignOut={signOutUser} />}
+        {activeTab === "profile"  && <PerfilPage savedPostIds={savedPosts} allPosts={posts} user={user} onSignOut={signOutUser} activeSection={profileSection} onActiveSectionChange={setProfileSection} />}
         {activeTab === "home" && (
           <>
             {selectedCategory === "duvida"    && <DuvidasPage />}
@@ -322,7 +334,7 @@ export default function MobileFeed() {
           aria-haspopup="dialog"
           aria-expanded={showCreatePost}
           className={[
-            "fixed bottom-24 right-6 w-14 h-14 bg-red-600 rounded-full shadow-lg",
+            "fixed bottom-24 right-6 w-14 h-14 bg-red-600 rounded-full shadow-lg lg:hidden",
             "flex items-center justify-center hover:bg-red-700 transition-colors z-20",
             "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-red-600",
           ].join(" ")}
@@ -515,7 +527,7 @@ export default function MobileFeed() {
         </div>
       )}
 
-      <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-2 pb-4 pt-2 z-10">
+      <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-2 pb-4 pt-2 z-10 lg:hidden">
         <div className="flex items-center justify-around max-w-md mx-auto">
           {bottomNavItems.map(({ id, label, icon: Icon }) => {
             const isActive = activeTab === id;
@@ -530,6 +542,76 @@ export default function MobileFeed() {
           })}
         </div>
       </nav>
+      </div>
+
+      <aside className="hidden h-full w-[300px] shrink-0 flex-col border-l border-gray-200 bg-white lg:flex" aria-label="Navegação principal">
+        <div className="border-b border-gray-200 px-7 py-8">
+          <button type="button" className="relative text-left" onClick={goHome} aria-label="UlifeConecta — Início">
+            <span className="text-2xl font-extrabold tracking-tight text-red-600">UlifeConecta</span>
+            <svg className="absolute -bottom-1 left-0 h-2 w-full" viewBox="0 0 200 10" preserveAspectRatio="none" aria-hidden="true">
+              <path d="M0 5 Q 50 0, 100 5 T 200 5" stroke="#dc2626" strokeWidth="2" fill="none" />
+            </svg>
+          </button>
+        </div>
+        <nav className="flex-1 space-y-1 overflow-y-auto px-5 py-5" aria-label="Menu principal">
+          {sideNavItems.map(({ id, label, icon: Icon }) => {
+            const isActive = id === "notifications"
+              ? showNotifications
+              : id === "saved"
+                ? activeTab === "profile" && profileSection === "salvos"
+                : activeTab === id;
+            return (
+              <button
+                key={id}
+                type="button"
+                onClick={() => {
+                  if (id === "notifications") {
+                    setShowNotifications(true);
+                  } else if (id === "saved") {
+                    setProfileSection("salvos");
+                    setActiveTab("profile");
+                  } else if (id === "home") {
+                    goHome();
+                  } else if (id === "profile") {
+                    setProfileSection("posts");
+                    setActiveTab("profile");
+                  } else {
+                    setActiveTab(id);
+                  }
+                }}
+                aria-current={isActive ? "page" : undefined}
+                className={`flex w-full items-center gap-4 rounded-xl px-4 py-3.5 text-left text-base transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-600 ${
+                  isActive ? "bg-red-600 text-white" : "text-slate-700 hover:bg-red-50 hover:text-red-700"
+                }`}
+              >
+                <span className="relative flex w-full items-center gap-4">
+                  <Icon className="h-6 w-6 shrink-0" aria-hidden="true" />
+                  <span>{label}</span>
+                  {id === "notifications" && unreadCount > 0 && (
+                    <span className={`ml-auto flex h-6 min-w-6 items-center justify-center rounded-full px-1.5 text-xs ${
+                      isActive ? "bg-white text-red-600" : "bg-red-600 text-white"
+                    }`} aria-label={`${unreadCount} notificações não lidas`}>
+                      {unreadCount}
+                    </span>
+                  )}
+                </span>
+              </button>
+            );
+          })}
+        </nav>
+        <div className="border-t border-gray-200 p-5">
+          <button
+            type="button"
+            onClick={() => setShowCreatePost(true)}
+            aria-haspopup="dialog"
+            aria-expanded={showCreatePost}
+            className="flex w-full items-center justify-center gap-3 rounded-xl bg-red-600 px-4 py-4 text-base text-white transition-colors hover:bg-red-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-600 focus-visible:ring-offset-2"
+          >
+            <Plus className="h-6 w-6" aria-hidden="true" />
+            Nova Publicação
+          </button>
+        </div>
+      </aside>
 
       {openCommentsPost && (
         <CommentsPanel
@@ -557,7 +639,7 @@ export default function MobileFeed() {
             animate={{ y: 0, opacity: 1, scale: 1 }}
             exit={{ y: 12, opacity: 0, scale: 0.96 }}
             transition={{ type: "spring", stiffness: 420, damping: 32 }}
-            className="fixed left-4 right-4 z-20 flex items-center justify-between gap-3 bg-gray-900 text-white rounded-2xl px-4 py-3 shadow-xl"
+            className="fixed left-4 right-4 z-20 flex items-center justify-between gap-3 bg-gray-900 text-white rounded-2xl px-4 py-3 shadow-xl lg:right-[320px]"
             style={{ bottom: "88px" }}
             role="status"
             aria-live="polite"
