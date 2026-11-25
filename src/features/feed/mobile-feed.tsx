@@ -229,7 +229,7 @@ export default function MobileFeed() {
             <path d="M120 35 Q 90 10, 60 35 T 0 35" stroke="#9ca3af" strokeWidth="1.5" />
             <path d="M120 65 Q 90 40, 60 65 T 0 65" stroke="#d1d5db" strokeWidth="1" />
           </svg>
-          <button className="relative z-10" onClick={goHome}>
+          <button className="relative z-10 lg:hidden" onClick={goHome}>
             <h1 className="text-3xl relative z-10">
               <span className="bg-gradient-to-r from-red-600 via-red-500 to-red-600 bg-clip-text text-transparent" style={{ fontWeight: 800, letterSpacing: "-0.5px" }}>
                 Ulife<span className="text-red-600">Conecta</span>
@@ -547,7 +547,11 @@ export default function MobileFeed() {
       <aside className="order-1 hidden h-full w-[300px] shrink-0 flex-col border-r border-gray-200 bg-white lg:flex" aria-label="Navegação principal">
         <div className="border-b border-gray-200 px-7 py-8">
           <button type="button" className="relative text-left" onClick={goHome} aria-label="UlifeConecta — Início">
-            <span className="text-2xl font-extrabold tracking-tight text-red-600">UlifeConecta</span>
+            <span className="text-3xl" style={{ fontWeight: 800, letterSpacing: "-0.5px" }}>
+              <span className="bg-gradient-to-r from-red-600 via-red-500 to-red-600 bg-clip-text text-transparent">
+                Ulife<span className="text-red-600">Conecta</span>
+              </span>
+            </span>
             <svg className="absolute -bottom-1 left-0 h-2 w-full" viewBox="0 0 200 10" preserveAspectRatio="none" aria-hidden="true">
               <path d="M0 5 Q 50 0, 100 5 T 200 5" stroke="#dc2626" strokeWidth="2" fill="none" />
             </svg>
