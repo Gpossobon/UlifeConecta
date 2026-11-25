@@ -210,7 +210,7 @@ export default function MobileFeed() {
 
   return (
     <div className="flex h-screen overflow-hidden bg-gray-50">
-      <div className="flex min-w-0 flex-1 flex-col">
+      <div className="order-2 flex min-w-0 flex-1 flex-col">
       <header className="sticky top-0 z-10 bg-white border-b border-gray-200">
         <div className="px-4 py-4 flex items-center justify-between relative overflow-hidden">
           <svg className="absolute left-0 top-0 w-40 h-24 opacity-10" viewBox="0 0 120 90" fill="none">
@@ -544,7 +544,7 @@ export default function MobileFeed() {
       </nav>
       </div>
 
-      <aside className="hidden h-full w-[300px] shrink-0 flex-col border-l border-gray-200 bg-white lg:flex" aria-label="Navegação principal">
+      <aside className="order-1 hidden h-full w-[300px] shrink-0 flex-col border-r border-gray-200 bg-white lg:flex" aria-label="Navegação principal">
         <div className="border-b border-gray-200 px-7 py-8">
           <button type="button" className="relative text-left" onClick={goHome} aria-label="UlifeConecta — Início">
             <span className="text-2xl font-extrabold tracking-tight text-red-600">UlifeConecta</span>
@@ -639,7 +639,7 @@ export default function MobileFeed() {
             animate={{ y: 0, opacity: 1, scale: 1 }}
             exit={{ y: 12, opacity: 0, scale: 0.96 }}
             transition={{ type: "spring", stiffness: 420, damping: 32 }}
-            className="fixed left-4 right-4 z-20 flex items-center justify-between gap-3 bg-gray-900 text-white rounded-2xl px-4 py-3 shadow-xl lg:right-[320px]"
+            className="fixed left-4 right-4 z-20 flex items-center justify-between gap-3 bg-gray-900 text-white rounded-2xl px-4 py-3 shadow-xl lg:left-[320px]"
             style={{ bottom: "88px" }}
             role="status"
             aria-live="polite"
